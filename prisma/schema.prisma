@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,9 +7,32 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id    Int    @id @default(autoincrement())
+  name  String
+  email String @unique
+  todos Todo[] @relation("UserTodos")
+}
+
 model Todo {
-  id        Int      @id @default(autoincrement())
-  title     String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  id           Int        @id @default(autoincrement())
+  title        String
+  description  String?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  status       TodoStatus @default(PENDING)
+  tags         String[]
+  priority     Float?
+  isUrgent     Boolean    @default(false)
+  assignedTo   User?      @relation("UserTodos", fields: [assignedToId], references: [id])
+  assignedToId Int?
+  subTasks     Todo[]     @relation("SubTasks")
+  parentTask   Todo?      @relation("SubTasks", fields: [parentTaskId], references: [id])
+  parentTaskId Int?
+}
+
+enum TodoStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
 }
