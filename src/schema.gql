@@ -3,8 +3,20 @@
 # ------------------------------------------------------
 
 input CreateTodoInput {
+  assignedToId: Int
+  description: String
+  isUrgent: Boolean! = false
+  parentTaskId: Int
+  priority: Float
+  status: TodoStatus! = PENDING
+  tags: [String!]
   title: String!
 }
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
 
 type Mutation {
   createTodo(createTodoInput: CreateTodoInput!): Todo!
@@ -18,12 +30,63 @@ type Query {
 }
 
 type Todo {
-  """Id field"""
+  """The user assigned to the Todo"""
+  assignedTo: User
+
+  """The creation date of the Todo"""
+  createdAt: DateTime!
+
+  """A detailed description of the Todo"""
+  description: String
+
+  """Unique identifier for the Todo"""
   id: Int!
+
+  """Indicates if the Todo is marked as urgent"""
+  isUrgent: Boolean!
+
+  """Priority of the Todo"""
+  priority: Float
+
+  """The status of the Todo"""
+  status: TodoStatus!
+
+  """Sub-tasks related to this Todo"""
+  subTasks: [Todo]
+
+  """A list of tags associated with the Todo"""
+  tags: [String]
+
+  """The title of the Todo"""
   title: String!
+
+  """The last update date of the Todo"""
+  updatedAt: DateTime
+}
+
+"""The status of the Todo"""
+enum TodoStatus {
+  COMPLETED
+  IN_PROGRESS
+  PENDING
 }
 
 input UpdateTodoInput {
+  assignedToId: Int
+  description: String
   id: Int!
+  isUrgent: Boolean = false
+  parentTaskId: Int
+  priority: Float
+  status: TodoStatus = PENDING
+  tags: [String!]
   title: String
+}
+
+type User {
+  email: String!
+
+  """Unique identifier for the user"""
+  id: Int!
+  name: String!
 }
